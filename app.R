@@ -2,6 +2,11 @@
 library(shiny)
 library(tidyverse)
 
+
+
+#rsconnect::writeManifest() #Generate a manifest.json file with the rsconnect library.
+#rsconnect::writeManifest(contentCategory = "site")
+#renv::dependencies() #查看各文件的依赖包
 ui <- fluidPage(
   titlePanel("中心极限定理"),
   sidebarLayout(
