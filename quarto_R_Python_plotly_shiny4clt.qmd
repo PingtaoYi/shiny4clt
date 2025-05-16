@@ -1,0 +1,226 @@
+---
+title: "跨语言分析"
+engine: knitr
+jupyter: python3.12
+format: html
+server: shiny
+#runtime: shiny
+execute:
+  cache: false
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+#｜ echo: false
+# library(reticulate)
+# Sys.setenv(RETICULATE_PYTHON = "/opt/anaconda3/envs/deeplearn/bin/python3.12")
+# use_python("/opt/anaconda3/envs/deeplearn/bin/python3.12")
+
+```
+
+```{r}
+#| echo: false
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed). \## NumPy
+
+```{python}
+import numpy as np
+a = np.arange(15).reshape(3, 5)
+
+```
+
+## Matplotlib
+
+```{python}
+import matplotlib.pyplot as plt
+fig = plt.figure()
+x = np.arange(10)
+y = 2.5 * np.sin(x / 20 * np.pi)
+yerr = np.linspace(0.05, 0.2, 10)
+
+plt.errorbar(x, y + 3, yerr=yerr, label='both limits (default)')
+plt.errorbar(x, y + 2, yerr=yerr, uplims=True, label='uplims=True')
+plt.errorbar(x, y + 1, yerr=yerr, uplims=True, lolims=True,
+             label='uplims=True, lolims=True')
+
+upperlimits = [True, False] * 5
+lowerlimits = [False, True] * 5
+plt.errorbar(x, y, yerr=yerr, uplims=upperlimits, lolims=lowerlimits,
+             label='subsets of uplims and lolims')
+
+plt.legend(loc='lower right')
+plt.show(fig)
+```
+
+## Plotly
+
+```{python}
+import plotly.express as px
+import plotly.io as pio
+gapminder = px.data.gapminder()
+gapminder2007 = gapminder.query("year == 2007")
+fig = px.scatter(gapminder2007, 
+                 x="gdpPercap", y="lifeExp", color="continent", 
+                 size="pop", size_max=60,
+                 hover_name="country")
+fig.show()
+```
+
+## Shiny Documents
+
+This Quarto document is made interactive using Shiny. Interactive documents allow readers to modify parameters and see the results immediately. Learn more about Shiny interactive documents at <https://quarto.org/docs/interactive/shiny/>.
+
+## Inputs and Outputs
+
+You can embed Shiny inputs and outputs in your document. Outputs are automatically updated whenever inputs change. This demonstrates how a standard R plot can be made interactive:
+
+```{r}
+sliderInput("bins", "Number of bins:",
+            min = 1, max = 50, value = 30)
+plotOutput("distPlot")
+```
+
+```{r}
+#| context: server
+output$distPlot <- renderPlot({
+   x <- faithful[, 2]  # Old Faithful Geyser data
+   bins <- seq(min(x), max(x), length.out = input$bins + 1)
+   hist(x, breaks = bins, col = 'darkgray', border = 'white',
+        xlab = 'Waiting time to next eruption (in mins)',
+        main = 'Histogram of waiting times')
+})
+```
+
+
+```{r}
+fluidPage(
+  titlePanel("中心极限定理"),
+  sidebarLayout(
+    sidebarPanel(
+      selectInput('seldist', '分布类型', choices = c('正态','均匀','二项式','泊松','指数'), selected = '正态'),
+      sliderInput('nrandom','随机变量数', min = 1, max = 100, value = 5, step = 5),
+      sliderInput('nsample','样本数', min = 500, max = 10000, value = 1000, step = 500),
+      sliderInput('nbin','条形分组数', min = 10, max = 100, value = 10, step = 5),
+    ),
+    mainPanel(
+      plotOutput('plothist')
+    ),
+    position = 'right' #用于确定slidebarPanel的位置
+  ),
+  
+  h4("文字靠中间的常用方法"),br(),
+  h5("方法1:用偏移量"),
+  fluidRow(
+    column(width = 12, offset = 3,
+           h2('体会响应表达式的意义'),
+           strong('如果改变条形分组数，恢复到原值时图形也会保持不变，而其他变量不会'),br(),
+           strong('这说明：表达式保存首次运行结果，在数值变动时再进行计算')
+    )
+  ),
+  
+  h5("方法2:设置居中"),
+  fluidRow(
+    align = "center",
+    h2("体会响应表达式的意义"),
+    p("如果改变条形分组数，恢复到原值时图形也会保持不变，而其他变量不会"),
+    "这说明：",strong('表达式保存首次运行结果，在数值变动时再进行计算')
+  ),
+  
+  br(),
+  br(),
+  
+  fluidRow(
+    column(2, '2个宽度', br(),br(),
+           checkboxGroupInput('x','多选框',choices = c(5,2,3,4),selected = 5),
+           actionButton('xx','行为按钮'),br(),br(),
+           textInput('xxx', '文本输入框', value = '在此输入'),br(),
+           numericInput('xxxx', '数值输入框', value = 1, min = 1, max = 100, step = 10)
+           
+           #submitButton('提交按钮') #该类按钮没有标签,设置后若页面更新，需要点击后才生效
+    ),
+    column(4, '3个宽度', br(),br(),
+           checkboxInput('y','单选框',value = F),
+           radioButtons('z','单选按钮',choices = letters[1:3], selected = 'c'),
+           dateRangeInput('w','日期区间',start = '2025-1-1',end = '2035-12-31')
+    ),
+    column(6, '7个宽度',br(),br(),
+           tabsetPanel(
+             id = "t",
+             type = "pills", #"tabs",
+             tabPanel("Plot", plotOutput("plot")),
+             tabPanel("Summary", verbatimTextOutput("summary")),
+             tabPanel("Table", DT::dataTableOutput("table") # tableOutput("table")
+             )
+           )
+    )
+  )
+)
+```
+
+```{r}
+#| context: server
+ #function(input, output){ ##在quarto中集成shiny，不需要function函数
+library(ggplot2)
+library(dplyr) # 下面需用到的函数包要加载上
+
+    active_data <- reactive({
+        n <- input$nrandom
+        m <- input$nsample
+        totalnum <- switch(
+            input$seldist,
+            '正态' = rnorm(m * n),
+            '均匀' = runif(m * n),
+            '二项式' = rbinom(m * n, size = 10, prob = 0.2),
+            '泊松' = rpois(m * n, lambda = 3),
+            '指数' = rexp(m * n, rate = 2)
+        )
+        data <- data.frame(x = rowMeans(matrix(data = totalnum, ncol = n)))
+    })
+    
+    # output$plothist <- renderPlot(ggplot(data = active_data(), aes(x = x)) +
+    #                                   geom_histogram(bins = input$nbin, alpha = 0.2, color = 'darkgreen')
+    # )
+    
+    # 追加密度拟合线
+    # output$plothist <- renderPlot(ggplot(data = active_data(), aes(x = x)) +
+    #                                 geom_histogram(aes(y = after_stat(density)),
+    #                                                bins = input$nbin, alpha = 0.2, color = 'darkgreen') +
+    #                                 geom_density(color = 'brown')
+    # )
+    
+    ## 追加指定的分布线
+    output$plothist <- renderPlot(ggplot(data = active_data(), aes(x = x)) +
+                                    geom_histogram(aes(y = after_stat(density)),
+                                                   bins = input$nbin, alpha = 0.2, color = 'darkgreen') +
+                                    geom_density(color = 'brown') +
+                                    stat_function(fun = dnorm, #dgamma
+                                                  args = list(mean = mean(active_data()$x),
+                                                              sd = sd(active_data()$x)),
+                                                  color = 'blue',linetype = 2, linewidth = 0.8)
+    )
+    
+    #-------演示用追加————————
+    output$plot <- renderPlot(mosaicplot(Titanic))
+    output$summary <- renderText(summary(cars))
+    output$table <- DT::renderDataTable(mtcars |> select(1:5)) #renderTable(mtcars)
+    #-------------------------
+#}
+```
+
+

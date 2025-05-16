@@ -2,11 +2,6 @@
 library(shiny)
 library(tidyverse)
 
-
-
-#rsconnect::writeManifest() #Generate a manifest.json file with the rsconnect library.
-#rsconnect::writeManifest(contentCategory = "site")
-#renv::dependencies() #查看各文件的依赖包
 ui <- fluidPage(
   titlePanel("中心极限定理"),
   sidebarLayout(
@@ -116,3 +111,10 @@ server <- function(input, output){
 
 shinyApp(ui = ui, server = server)
 
+#------关于网络部署------
+## 两个通道（https://login.shinyapps.io/如果没有注册，需先注册账号）：
+##shinyapps.io方便直接，可以用publish根据提示上传，双文件、单文件shiny或quarto都可。
+##shiny connect cloud。需在github建仓，仅用单独app.R方式，同时需要manifest.json文件。生成方式如下。
+#rsconnect::writeManifest(contentCategory = "site") #用这条语句生成
+#rsconnect::writeManifest() #Generate a manifest.json file with the rsconnect library.
+#renv::dependencies() #查看各文件的依赖包
