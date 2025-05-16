@@ -1,0 +1,8 @@
+{
+  "name": "shiny4clt",
+  "short_name": "s4clt",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3367D6"
+}
