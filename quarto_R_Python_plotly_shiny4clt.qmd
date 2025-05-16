@@ -4,7 +4,6 @@ engine: knitr
 jupyter: python3.12
 format: html
 server: shiny
-#runtime: shiny
 execute:
   cache: false
 ---
@@ -22,7 +21,7 @@ When you click the **Render** button a document will be generated that includes 
 # library(reticulate)
 # Sys.setenv(RETICULATE_PYTHON = "/opt/anaconda3/envs/deeplearn/bin/python3.12")
 # use_python("/opt/anaconda3/envs/deeplearn/bin/python3.12")
-
+# rsconnect::writeManifest(contentCategory = "site") #生成Manifest.json文件
 ```
 
 ```{r}
